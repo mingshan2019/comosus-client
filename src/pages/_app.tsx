@@ -1,7 +1,7 @@
 import type { AppProps } from 'next/app';
 import { appWithI18Next } from 'ni18n';
 import { ni18nConfig } from '../ni18n.config';
-
+import '../common/styles/global.scss';
 import { ApiClientProvider, ThemeContextProvider } from '@common/contexts';
 
 function MyApp({ Component, pageProps }: AppProps) {
