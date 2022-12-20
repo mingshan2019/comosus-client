@@ -7,6 +7,11 @@
       "menu": {
         "add-new-link": "添加新链接",
         "explore": "探索更多选择"
+      },
+      "toggle": {
+        "prompt": "永久删除吗？",
+        "cancel": "取消",
+        "delete": "删除"
       }
     },
     "preview": {
@@ -19,12 +24,40 @@
   },
   "appearance": {
     "profile": {
+      "heading": "用户信息",
       "title": "资料",
       "pick-an-image": "选择图像",
+      "upload": "上传",
       "remove": "移除",
       "profile-title": "标题",
       "bio": "简介",
       "bio-placeholder": "输入个人简介以显示在您的个人资料中"
+    }
+  },
+  "nft": {
+    "wallet": {
+      "heading": "钱包",
+      "message": "快连接你的虚拟货币钱包叭 💳",
+      "address-label": "钱包地址:",
+      "action": {
+        "connect": "连接",
+        "mint": "挖NFT"
+      }
+    },
+    "owned-nfts": {
+      "heading": "已有NFTs {{value}}",
+      "message": "连接你的钱包来显示你都有啥NFT叭!",
+      "action": {
+        "view": "在OpeaSea上查看",
+        "set-avatar": "设置为头像"
+      }
+    }
+  },
+  "settings": {
+    "danger-zone": {
+      "title": "危险区域",
+      "action": "删除账号",
+      "message": "真的吗? 你真的舍得离开我们吗? "
     }
   }
 }

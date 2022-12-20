@@ -1,52 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/router';
-import { useAuth, useApiClient } from '@common/contexts';
-import { useLoginMutation } from '@generated/graphql.queries';
+import { useLoginApi } from '@src/services/auth/auth.api';
 
-import { VStack } from '@chakra-ui/react';
+import { Center } from '@chakra-ui/react';
 import { PageContainer } from '@src/common/components';
 import { LoginForm } from '@src/modules/auth';
-import { isNil } from 'lodash';
-import { AppRoute } from '@src/constants/PageRoutes';
-import { UserStatus } from '@src/constants';
 
 export default function Login() {
   const { t } = useTranslation('auth');
-  const router = useRouter();
   const head = { title: t('login.title') };
 
-  const { setAccessToken } = useAuth();
-  const { gqlClient } = useApiClient();
-  const {
-    mutate: login,
-    error,
-    isLoading: isLoggingIn,
-  } = useLoginMutation(gqlClient, {
-    onSettled: (data, error) => {
-      if (error) {
-        // @ts-ignore
-        console.error(error.message);
-      }
-
-      if (data) {
-        const {
-          login: {
-            accessToken,
-            user: { id, status },
-          },
-        } = data;
-
-        setAccessToken(accessToken);
-        status === UserStatus.Registered
-          ? router.push({
-              pathname: AppRoute.Onboarding,
-              query: { id },
-            })
-          : router.push(AppRoute.Admin);
-      }
-    },
-  });
+  const { login, error, isLoggingIn } = useLoginApi();
 
   const onSubmit = (value: LoginFormTypes) => {
     login({ payload: value });
@@ -54,13 +18,9 @@ export default function Login() {
 
   return (
     <PageContainer head={head}>
-      <VStack justify="center">
-        <LoginForm
-          onSubmit={onSubmit}
-          isLoading={isLoggingIn}
-          isInvalid={!isNil(error)}
-        />
-      </VStack>
+      <Center flex={1}>
+        <LoginForm onSubmit={onSubmit} isLoading={isLoggingIn} error={error} />
+      </Center>
     </PageContainer>
   );
 }

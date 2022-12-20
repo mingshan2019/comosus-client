@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useToggle } from '@src/utils/hooks';
 import { useTranslation } from 'react-i18next';
-import { useOnboardUserMutation } from '@generated/graphql.queries';
+import {
+  useOnboardUserMutation,
+  useVerifyAccountSendEmailMutation,
+} from '@generated/graphql.queries';
 import { useApiClient } from '@src/common/contexts';
 import { useRouter } from 'next/router';
-import { AppRoute, GlobalRoute } from '@src/constants';
+import { GlobalRoute } from '@src/constants';
 
-import { VStack } from '@chakra-ui/react';
+import { Center } from '@chakra-ui/react';
 import { PageContainer } from '@src/common/components';
 import { OnboardedMessage, OnboardingForm } from '@src/modules/onboarding';
 
@@ -28,6 +31,7 @@ export default function Onboarding({ id }: OnboardingProps) {
   const { gqlClient } = useApiClient();
   const [email, setEmail] = useState('');
   const [isOnboarded, toggleIsOnboarded] = useToggle();
+
   const { mutate: onboardUser, isLoading: isOnboarding } =
     useOnboardUserMutation(gqlClient, {
       onSettled: (data) => {
@@ -37,6 +41,21 @@ export default function Onboarding({ id }: OnboardingProps) {
         }
       },
     });
+
+  const { mutate: verifyAccountSendEmail } = useVerifyAccountSendEmailMutation(
+    gqlClient,
+    {
+      onSettled: (data, error) => {
+        if (error) {
+          console.error(error);
+        }
+        if (data) {
+          // eslint-disable-next-line no-console
+          console.log(data);
+        }
+      },
+    },
+  );
 
   useEffect(() => {
     if (typeof id !== 'string') router.push(GlobalRoute.Error);
@@ -50,21 +69,23 @@ export default function Onboarding({ id }: OnboardingProps) {
         ...payload,
       },
     });
-  };
-
-  const onContinue = () => {
-    router.push(AppRoute.Admin);
+    verifyAccountSendEmail({
+      detail: {
+        id,
+      },
+    });
   };
 
   return (
     <PageContainer head={head} disableNavOptions>
-      <VStack alignSelf="center" width="670px" align="stretch" gap="60px">
+      {/* <VStack alignSelf="center" width="670px" align="stretch" gap="60px"> */}
+      <Center flex={1}>
         {isOnboarded ? (
-          <OnboardedMessage onContinue={onContinue} email={email} />
+          <OnboardedMessage email={email} />
         ) : (
           <OnboardingForm onSubmit={onSubmit} isOnboarding={isOnboarding} />
         )}
-      </VStack>
+      </Center>
     </PageContainer>
   );
 }

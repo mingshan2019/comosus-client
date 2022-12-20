@@ -1,6 +1,7 @@
 export enum GlobalRoute {
   Root = '/',
   Error = '/error',
+  Project = '/about-project',
 }
 
 export enum AuthRoute {
@@ -12,6 +13,10 @@ export enum AuthRoute {
 
 export enum AppRoute {
   Onboarding = '/onboarding',
+  PromptVerify = '/please-verify-account',
   Admin = '/admin',
   Appearance = '/admin/appearance',
+  NFT = '/admin/nft',
+  Settings = '/admin/settings',
+  Contact = '/contact-us',
 }

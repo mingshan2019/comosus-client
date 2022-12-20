@@ -44,7 +44,14 @@ export default function ForgetPasswordForm({
   });
 
   return (
-    <VStack flex={1} justify="center" align="stretch" gap="40px" minW="480px">
+    <VStack
+      flex={1}
+      justify="center"
+      align="stretch"
+      gap="4rem"
+      w="clamp(62.5%, 48rem, 100%)"
+      maxW="48rem"
+    >
       <VStack align="flex-start">
         <Text type="generic.h1" mb={1}>
           {t('forget-password.page.title')}
@@ -56,16 +63,14 @@ export default function ForgetPasswordForm({
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormControl isInvalid={isInvalid}>
-          <Text fontWeight="600" mb={2}>
-            {t('forget-password.email.label')}
-          </Text>
-          <VStack align="stretch" gap="30px">
+          <VStack align="stretch" gap="3rem">
             {formValues.inputs.map(({ type, name, placeholder }, index) => (
               <Input
                 key={index}
                 type={type}
                 name={name}
                 control={control}
+                label={t('forget-password.email.label')}
                 placeholder={placeholder}
               />
             ))}
@@ -73,7 +78,7 @@ export default function ForgetPasswordForm({
               testId="forget-password.error"
               error={t('forget-password.error')}
             />
-            <Button type="submit" isLoading={isLoading}>
+            <Button type="submit" isLoading={isLoading} size="lg">
               {t('forget-password.button')}
             </Button>
           </VStack>

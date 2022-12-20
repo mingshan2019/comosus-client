@@ -1,16 +1,11 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import { useTranslation } from 'react-i18next';
 import { AuthRoute } from '@src/constants/PageRoutes';
 
-import { VStack, Image } from '@chakra-ui/react';
-import {
-  SectionHContainer,
-  Button,
-  Text,
-  PageContainer,
-} from '@src/common/components';
+import { PageContainer } from '@src/common/components';
+import { HomeHeroCard } from '@src/modules/home';
+import { VStack } from '@chakra-ui/react';
 
 const Home: NextPage = () => {
   const { t } = useTranslation('home');
@@ -30,14 +25,14 @@ const Home: NextPage = () => {
     ],
   };
 
-  const router = useRouter();
   const heros = [
     {
       title: t('banner.title'),
+      headline: t('headline'),
       subtitle: t('banner.subtitle'),
       cta: t('banner.cta'),
       link: AuthRoute.SignUp,
-      src: 'assets/heros/shapes.svg',
+      src: 'assets/heros/phone.svg',
       alt: t('banner.alt'),
     },
     {
@@ -45,7 +40,7 @@ const Home: NextPage = () => {
       subtitle: t('custome-profile.subtitle'),
       cta: t('custome-profile.cta'),
       link: AuthRoute.SignUp,
-      src: 'assets/heros/phone.svg',
+      src: 'assets/heros/shapes.svg',
       alt: t('custome-profile.alt'),
     },
     {
@@ -68,33 +63,13 @@ const Home: NextPage = () => {
 
   return (
     <PageContainer head={head}>
-      <VStack alignSelf="stretch" align="stretch">
+      <VStack spacing={['12rem', '0rem']}>
         {heros.map((hero, index) => (
-          <SectionHContainer
-            key={index}
-            flexDirection={index % 2 === 0 ? 'row' : 'row-reverse'}
-          >
-            <VStack alignItems="flex-start" gap="1rem">
-              <Text type={index === 0 ? 'h1' : 'h2'} color="#F0F435">
-                {hero.title}
-              </Text>
-              <Text type="h4" color="#F0F435">
-                {hero.subtitle}
-              </Text>
-              <Button
-                onClick={() => router.push(hero.link)}
-                background="linear-gradient(180deg, #FF3F66 0%, #E75784 100%)"
-              >
-                {hero.cta}
-              </Button>
-            </VStack>
-
-            <Image
-              marginInlineStart="0 !important"
-              src={hero.src}
-              alt={hero.alt}
-            />
-          </SectionHContainer>
+          <HomeHeroCard
+            key={hero.title}
+            hero={hero}
+            isReversed={index % 2 !== 0}
+          />
         ))}
       </VStack>
     </PageContainer>

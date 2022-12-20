@@ -6,26 +6,26 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { AuthRoute } from '@src/constants/PageRoutes';
 
 import { VStack, FormControl } from '@chakra-ui/react';
-import { AiOutlineUser } from 'react-icons/ai';
-import { RiLockPasswordLine } from 'react-icons/ri';
 import {
-  Logo,
+  Icon,
   Input,
   Button,
   Text,
   Link,
   FormErrorMessage,
 } from '@common/components';
+import { LoginError } from '@generated/graphql.queries';
+import { isNil } from 'lodash';
 
 type LoginFormProps = {
   onSubmit: (values: LoginFormTypes) => void;
   isLoading: boolean;
-  isInvalid: boolean;
+  error: LoginError | null;
 };
 export default function LoginForm({
   onSubmit,
   isLoading,
-  isInvalid,
+  error,
 }: LoginFormProps) {
   const { t } = useTranslation('auth');
 
@@ -36,13 +36,13 @@ export default function LoginForm({
         type: 'text',
         name: 'username',
         placeholder: t('login.username.placeholder'),
-        leftElement: <AiOutlineUser />,
+        leftElement: <Icon variant="account" />,
       },
       {
         type: 'password',
         name: 'password',
         placeholder: t('login.password.placeholder'),
-        leftElement: <RiLockPasswordLine />,
+        leftElement: <Icon variant="password" />,
       },
     ],
     defaultValues: {
@@ -67,15 +67,18 @@ export default function LoginForm({
   });
 
   return (
-    <VStack minW="480px" align="stretch" gap="60px">
-      <Logo />
+    <VStack
+      align="stretch"
+      gap="6rem"
+      w="clamp(62.5%, 48rem, 100%)"
+      maxW="48rem"
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl isInvalid={isInvalid}>
-          <VStack align="stretch" gap="30px">
+        <FormControl isInvalid={!isNil(error)}>
+          <VStack align="stretch" gap="3rem">
             {formValues.inputs.map(
               ({ type, name, placeholder, leftElement }, index) => (
                 <Input
-                  isUnderline
                   key={index}
                   type={type}
                   name={name}
@@ -85,11 +88,19 @@ export default function LoginForm({
                 />
               ),
             )}
-            <FormErrorMessage testId="login.error" error={t('login.error')} />
-            <Button highlight type="submit" isLoading={isLoading}>
+            <FormErrorMessage
+              testId="login.error"
+              error={t(`login.error.${error?.key}`)}
+            />
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              variant="accent"
+              size="lg"
+            >
               {t('login.button')}
             </Button>
-            <Link href={AuthRoute.forgetPassword} textAlign="center">
+            <Link href={AuthRoute.forgetPassword} variant="accent">
               {t('login.forget-password')}
             </Link>
           </VStack>
@@ -97,7 +108,7 @@ export default function LoginForm({
       </form>
       <Text textAlign="center">
         {t('login.no-account.description')}
-        <Link highlight href={AuthRoute.SignUp}>
+        <Link href={AuthRoute.SignUp} variant="highlight">
           {t('login.no-account.action')}
         </Link>
       </Text>

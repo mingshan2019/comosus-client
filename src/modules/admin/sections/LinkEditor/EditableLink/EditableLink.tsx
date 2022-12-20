@@ -1,21 +1,18 @@
 import React, { useEffect } from 'react';
 import * as yup from 'yup';
 import { useApiClient } from '@common/contexts';
-import {
-  useDeleteLinkByIdMutation,
-  useUpdateLinkMutation,
-} from '@generated/graphql.queries';
+import { useUpdateLinkMutation } from '@generated/graphql.queries';
+import { useForm } from 'react-hook-form';
+import { useToggle } from '@src/utils/hooks';
 
 import { HStack, VStack, Image, IconButton } from '@chakra-ui/react';
-import { RiDeleteBin5Line } from 'react-icons/ri';
-
-import EditableLinkInput from './EditableLink.Input';
-import EditableLinkButton from './EditableLink.Button';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LinkQueries } from '@src/constants';
-import EditableLinkSwitch from './EditableLink.Switch';
 import { DraggableProvided } from 'react-beautiful-dnd';
+import EditableLinkInput from './EditableLink.Input';
+import EditableLinkDelete from './EditableLink.Delete';
+import EditableLinkSwitch from './EditableLink.Switch';
+import { Icon } from '@src/common/components';
 
 type EditableLinkProps = {
   link: {
@@ -34,7 +31,7 @@ export default function EditableLink({
   draggableProps: { provided },
 }: EditableLinkProps) {
   const { id, isVisible, title, url } = link;
-
+  const [showDelete, toggleShowDelete] = useToggle();
   useEffect(() => {
     reset({
       isVisible,
@@ -90,43 +87,29 @@ export default function EditableLink({
       },
     });
   };
-
-  const { mutate: deleteLink, isLoading: isDeleting } =
-    useDeleteLinkByIdMutation(gqlClient, {
-      onSettled: (data, error) => {
-        if (error) {
-          // TODO: handle deletion error
-        } else {
-          queryClient.invalidateQueries(LinkQueries.FindAllOfAnUser);
-          queryClient.invalidateQueries(LinkQueries.FindByUsername);
-        }
-      },
-    });
-
-  const handleDelete = () => deleteLink({ payload: { id } });
-
   return (
-    <HStack
-      align="stretch"
-      gap={5}
-      borderRadius={4}
-      p={[5, 10, 4, 4]}
-      bg="white"
-      {...provided.draggableProps}
-      ref={provided.innerRef}
-    >
-      <HStack align="stretch" {...provided.dragHandleProps}>
-        <Image
-          src="/assets/icons/drag-handle.svg"
-          alt="drag-handle"
-          pr={4}
-          borderRight="1px solid #ADB2C6"
-        />
-      </HStack>
+    <VStack align="stretch" spacing="2rem">
+      <HStack
+        align="stretch"
+        spacing="2rem"
+        borderRadius="1rem"
+        p={['1.25rem', '2.5rem']}
+        bg="#272429"
+        fontSize="1.6rem"
+        {...provided.draggableProps}
+        ref={provided.innerRef}
+      >
+        <HStack align="stretch" {...provided.dragHandleProps}>
+          <Image
+            src="/assets/icons/drag-handle.svg"
+            alt="drag-handle"
+            pr="1rem"
+            borderRight="1px solid #ADB2C6"
+          />
+        </HStack>
 
-      <HStack flex={1} justify="space-between" align="stretch" gap={5}>
-        <VStack flex={1} align="stretch">
-          <VStack align="stretch">
+        <HStack flex={1} justify="space-between" align="stretch" gap="2rem">
+          <VStack flex={1} justify="space-between" align="space">
             {formValues.inputs.map(({ name, placeholder }, index) => (
               <EditableLinkInput
                 key={index}
@@ -138,30 +121,27 @@ export default function EditableLink({
             ))}
           </VStack>
 
-          <HStack gap={2}>
-            <EditableLinkButton />
-            <EditableLinkButton />
-            <EditableLinkButton />
-            <EditableLinkButton />
-          </HStack>
-        </VStack>
-
-        <VStack justify="space-between">
-          <EditableLinkSwitch
-            name="isVisible"
-            control={control}
-            onChange={handleSubmit(onSubmit)}
-          />
-          <IconButton
-            onClick={handleDelete}
-            isLoading={isDeleting}
-            icon={<RiDeleteBin5Line />}
-            aria-label="delete link"
-            maxH={5}
-            bg="none"
-          />
-        </VStack>
+          <VStack justify="space-between" spacing="1rem">
+            <EditableLinkSwitch
+              name="isVisible"
+              control={control}
+              onChange={handleSubmit(onSubmit)}
+            />
+            <IconButton
+              onClick={() => toggleShowDelete()}
+              icon={<Icon variant="delete" />}
+              aria-label="delete link"
+              fontSize="1.6rem"
+              bg="none"
+            />
+          </VStack>
+        </HStack>
       </HStack>
-    </HStack>
+      <EditableLinkDelete
+        id={id}
+        showDelete={showDelete}
+        toggleShowDelete={toggleShowDelete}
+      />
+    </VStack>
   );
 }

@@ -1,47 +1,62 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useApiClient, useUser } from '@src/common/contexts';
 import { useFindUserByUsernameQuery } from '@generated/graphql.queries';
 
-import {
-  useDisclosure,
-  Avatar,
-  HStack,
-  IconButton,
-  Spinner,
-  VStack,
-} from '@chakra-ui/react';
+import { HStack, IconButton, Spinner, VStack, Center } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Logo, Text, ProfileItem } from '@src/common/components';
-import { BsShareFill } from 'react-icons/bs';
-import { FaShareSquare } from 'react-icons/fa';
+import {
+  Logo,
+  Icon,
+  Avatar,
+  Text,
+  ProfileItem,
+  Button,
+} from '@src/common/components';
 import SharePanel from './ProfilePreview.SharePanel';
+import { useToggle } from '@src/utils/hooks';
 
 export default function ProfilePreview() {
   const { t } = useTranslation('admin');
-  const {
-    user: { username },
-  } = useUser();
+  const { user } = useUser();
 
-  const enabled = useMemo(() => {
-    return !_.isNil(username);
-  }, [username]);
   const { gqlClient } = useApiClient();
   const { data: userData, isLoading } = useFindUserByUsernameQuery(
     gqlClient,
-    { payload: { username } },
+    { payload: { username: user.username } },
     {
-      enabled,
+      enabled: !_.isNil(user.username),
       select: (data) => data.findUserByUsername,
     },
   );
 
-  const { isOpen: isSharing, onOpen, onClose } = useDisclosure();
+  const [isPreview, togglePreview] = useToggle();
+  const [isSharing, toggleSharing] = useToggle();
 
   return (
     <>
-      <VStack flex={1} justify="center" align="center" p="20px">
+      <Center
+        zIndex={999}
+        position="absolute"
+        bottom="0"
+        display={['flex', 'none']}
+        pb="2rem"
+        w="100%"
+      >
+        <Button flex={0.4} onClick={togglePreview}>
+          Open Preview
+        </Button>
+      </Center>
+      <VStack
+        position={isPreview ? 'absolute' : 'relative'}
+        display={isPreview ? 'flex' : ['none', 'flex']}
+        flex={1}
+        justify="center"
+        p="2rem"
+        w="100%"
+        borderLeft={['none', '.1rem solid #4F4F58']}
+      >
         <VStack
           position="relative"
           justify="space-between"
@@ -49,7 +64,7 @@ export default function ProfilePreview() {
           __css={{
             '&::-webkit-scrollbar': { display: 'none' },
           }}
-          gap={20}
+          gap="2rem"
           border="5px solid #3B3C46"
           borderRadius="20px"
           p="10px"
@@ -58,20 +73,24 @@ export default function ProfilePreview() {
           bgGradient="linear-gradient(180deg, #465E79 0%, #4B3F4F 97.92%)"
         >
           {isLoading ? (
-            <Spinner />
+            <Center flex={1}>
+              <Spinner size="xl" />
+            </Center>
           ) : (
             <VStack alignSelf="stretch" gap={5}>
               <IconButton
-                onClick={onOpen}
+                onClick={toggleSharing}
                 aria-label={t('link.preview.share')}
-                icon={<FaShareSquare />}
+                icon={<Icon variant="share-btn" />}
                 position="absolute"
                 top={5}
                 right={2.5}
+                color="#3B3C46"
+                fontSize="1.6rem"
               />
 
               <VStack>
-                <Avatar size="lg" src="https://picsum.photos/200" />
+                <Avatar user={user} size="xl" />
                 <Text color="white">
                   {userData?.displayName || userData?.username}
                 </Text>
@@ -87,11 +106,11 @@ export default function ProfilePreview() {
             </VStack>
           )}
 
-          <Logo color="white" variant="inline" />
+          <Logo variant="inline" />
         </VStack>
 
         <HStack>
-          <BsShareFill />
+          <Icon variant="share" />
           <Text textDecoration="underline">
             <Link href={`/${userData?.username}`} passHref>
               <a target="_blank" rel="noreferrer">
@@ -101,7 +120,7 @@ export default function ProfilePreview() {
           </Text>
         </HStack>
       </VStack>
-      {isSharing && <SharePanel isOpen={isSharing} onClose={onClose} />}
+      {isSharing && <SharePanel isOpen={isSharing} onClose={toggleSharing} />}
     </>
   );
 }

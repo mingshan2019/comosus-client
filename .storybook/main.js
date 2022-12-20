@@ -15,17 +15,12 @@ module.exports = {
     emotionAlias: false,
   },
   framework: '@storybook/react',
-  core: {
-    builder: '@storybook/builder-webpack5',
-  },
   staticDirs: ['../public'],
   webpackFinal: async (config, { configType }) => {
-    config.resolve.plugins = [new TsconfigPathsPlugin()];
-    config.module.rules.push({
-      test: /\.scss$/,
-      use: ['style-loader', 'css-loader', 'sass-loader'],
-      include: path.resolve(__dirname, '../'),
-    });
+    config.resolve = {
+      ...config.resolve,
+      plugins: [new TsconfigPathsPlugin()],
+    };
     return config;
   },
 };
